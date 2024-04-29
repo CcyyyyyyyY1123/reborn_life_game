@@ -175,7 +175,18 @@ class GamePage(tk.Frame):
         for _ in range(age_increment):
             age_over = self.character.update_age()
             if age_over:
-                messagebox.showinfo("游戏结束", f"{self.character.name}已达到{self.character.age_limit}岁, 游戏结束。")
+                max_talent, max_value = max(self.character.talents.items(), key=lambda x: x[1])
+                max_talent_title = {
+                    '体魄': '健康一生',
+                    '快乐': '幸福美满',
+                    '美貌': '美貌惊人',
+                    '经验': '学习力max',
+                    '金钱': '富豪',
+                    '人脉': '宾客满堂',
+                    '正气': '一身正气'
+                }
+                ending_message = f"恭喜玩家{self.character.name}达成{max_talent_title[max_talent]}结局，你的{max_talent}值最高，愿你这一生按照你想要的轨迹度过。"
+                messagebox.showinfo("游戏结束", ending_message)
                 self.master.destroy()  # Close the window
                 return
 
@@ -655,6 +666,7 @@ class SampleApp(tk.Tk):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.pack()
+
 
 if __name__ == "__main__":
     app = SampleApp()
