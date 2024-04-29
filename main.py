@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
+
 class Character:
     def __init__(self, name, gender):
         self.name = name
@@ -58,35 +59,34 @@ class StartPage(tk.Frame):
         self.character = None
         self.event_manager = EventManager()
 
-        tk.Label(self, text="角色的名字：").grid(row=0, column=0, sticky="w")
+        # User input for character creation
+        tk.Label(self, text="角色的名字：").grid(row=0, column=0)
         self.name_var = tk.Entry(self)
-        self.name_var.grid(row=0, column=1, sticky="ew")  # Expand entry horizontally
+        self.name_var.grid(row=0, column=1)
 
-        tk.Label(self, text="角色的性别：").grid(row=1, column=0, sticky="w")
+        # Gender selection
+        tk.Label(self, text="角色的性别：").grid(row=1, column=0)
         self.gender_var = tk.StringVar(self)
-        self.gender_var.set("男")
+        self.gender_var.set("男")  # default value
         genders = ["男", "女"]
         self.gender_menu = tk.OptionMenu(self, self.gender_var, *genders)
-        self.gender_menu.grid(row=1, column=1, sticky="ew")
+        self.gender_menu.grid(row=1, column=1)
 
-        self.grid_columnconfigure(1, weight=1)  # Make the second column expandable
-
-        # Talent display setup with grid
+        # Talent display
         self.talents_labels = {}
         row = 2
-        for talent in ["体魄", "快乐", "美貌", "经验", "金钱", '人脉', '正气']:
-            tk.Label(self, text=f"{talent}：").grid(row=row, column=0, sticky="w")
+        for talent in ["体魄", "快乐", "美貌", "经验", "金钱",'人脉','正气']:
+            tk.Label(self, text=f"{talent}：").grid(row=row, column=0)
             label = tk.Label(self, text="0")
-            label.grid(row=row, column=1, sticky="ew")
+            label.grid(row=row, column=1)
             self.talents_labels[talent] = label
             row += 1
 
         # Buttons
-        tk.Button(self, text="生成天赋", command=self.generate_talents).grid(row=row, column=0, columnspan=2, sticky="ew")
-        tk.Button(self, text="开始游戏", command=self.start_game).grid(row=row + 1, column=0, columnspan=2, sticky="ew")
+        tk.Button(self, text="生成天赋", command=self.generate_talents).grid(row=row, column=0, columnspan=2)
+        tk.Button(self, text="开始游戏", command=self.start_game).grid(row=row + 1, column=0, columnspan=2)
 
-        self.pack(fill="both", expand=True)  # Make the frame expand with the window
-
+        self.pack()
 
     def generate_talents(self):
         """ Generate and update talent values display """
@@ -118,23 +118,25 @@ class GamePage(tk.Frame):
         self.master.title(f"游戏进行中 - {self.character.name}")
         self.eighteen_event_triggered = False
         self.create_widgets()
-        self.pack(fill="both", expand=True)
+        self.pack()
 
     def create_widgets(self):
-        tk.Label(self, text=f"角色名: {self.character.name}").pack(fill="x")
-        tk.Label(self, text=f"性别: {self.character.gender}").pack(fill="x")
+        tk.Label(self, text=f"角色名: {self.character.name}").pack()
+        tk.Label(self, text=f"性别: {self.character.gender}").pack()
         self.age_label = tk.Label(self, text=f"年龄: {self.character.age}")
-        self.age_label.pack(fill="x")
+        self.age_label.pack()
         self.talent_labels = {}
         for talent, value in self.character.talents.items():
             label = tk.Label(self, text=f"{talent}: {value}")
-            label.pack(fill="x")
+            label.pack()
             self.talent_labels[talent] = label
         self.event_label = tk.Label(self, text="当前事件: 等待发生")
-        self.event_label.pack(fill="x")
+        self.event_label.pack()
         self.history_listbox = tk.Listbox(self, height=10, width=50)
-        self.history_listbox.pack(fill="both", expand=True)
-        tk.Button(self, text="下一步", command=self.next_step).pack(fill="x")
+        self.history_listbox.pack()
+        tk.Button(self, text="下一步", command=self.next_step).pack()
+        for event in self.character.events_history:
+            self.history_listbox.insert(tk.END, event)
 
     def next_step(self):
         # Check special events before age update
@@ -165,6 +167,10 @@ class GamePage(tk.Frame):
             # Trigger a random event if the character is 18 or older
             self.trigger_random_event()
 
+        elif self.character.age >= 18 and self.random_event_counter < 20:  # Check and trigger random event if event counter is less than 20
+            self.trigger_random_event()
+            self.random_event_counter += 1  # Increase the random event counter
+            event_triggered = True
         # Update age by the determined increment
         for _ in range(age_increment):
             age_over = self.character.update_age()
